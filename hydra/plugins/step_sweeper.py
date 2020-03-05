@@ -44,6 +44,9 @@ class StepSweeper(Sweeper):
             config=config, config_loader=config_loader, task_function=task_function
         )
 
+    def initialize_arguments(self, arguments: List[str]):
+        ...
+
     @abstractmethod
     def get_job_batch(self) -> Sequence[Sequence[str]]:
         """
@@ -72,11 +75,13 @@ class StepSweeper(Sweeper):
     def sweep(self, arguments: List[str]) -> Any:
         assert self.config is not None
         assert self.launcher is not None
-        self.arguments = arguments
+        self.initialize_arguments(arguments)
         returns: List[Sequence[JobReturn]] = []
+        initial_idx = 0
         while not self.is_done():
             batch = self.get_job_batch()
-            results = self.launcher.launch(batch)
+            results = self.launcher.launch(batch, initial_idx=initial_idx)
+            initial_idx += len(batch)
             returns.append(results)
             self.update_results(results)
         return returns

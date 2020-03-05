@@ -16,7 +16,7 @@ Basic Sweeper would generate 6 jobs:
 import copy
 import itertools
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Optional, Sequence, List
 
 from hydra.conf import PluginConf
 from hydra.core.config_store import ConfigStore
@@ -55,20 +55,22 @@ class BasicSweeper(StepSweeper):
         """
         super(BasicSweeper, self).__init__(max_batch_size=max_batch_size)
         self.job_results: Optional[Sequence[JobReturn]] = None
+        self.overrides: Optional[Sequence[Sequence[str]]] = None
+
+    def initialize_arguments(self, arguments: List[str]):
+        lists = []
+        for s in arguments:
+            key, value = s.split("=")
+            lists.append(["{}={}".format(key, val) for val in value.split(",")])
+
+        self.overrides: Sequence[Sequence[str]] = list(itertools.product(*lists))
 
     def get_job_batch(self) -> Sequence[Sequence[str]]:
         """
         :return: A list of lists of strings, each inner list is the overrides for a single job
         that should be executed.
         """
-
-        assert self.arguments is not None
-        lists = []
-        for s in self.arguments:
-            key, value = s.split("=")
-            lists.append(["{}={}".format(key, val) for val in value.split(",")])
-
-        return list(itertools.product(*lists))
+        return self.overrides
 
     def is_done(self) -> bool:
         # just one batch
