@@ -15,10 +15,33 @@ Basic Sweeper would generate 6 jobs:
 """
 import copy
 import itertools
+from dataclasses import dataclass
 from typing import Optional, Sequence
 
+from hydra.conf import PluginConf
+from hydra.core.config_store import ConfigStore
 from hydra.core.utils import JobReturn
 from hydra.plugins.step_sweeper import StepSweeper
+
+
+@dataclass
+class BasicSweeperConf(PluginConf):
+    cls: str = "hydra._internal.core_plugins.basic_sweeper.BasicSweeper"
+
+    @dataclass
+    class Params:
+        max_batch_size: Optional[int] = None
+
+    params: Params = Params()
+
+
+ConfigStore.instance().store(
+    group="hydra/sweeper",
+    name="basic",
+    node=BasicSweeperConf,
+    path="hydra.sweeper",
+    provider="hydra",
+)
 
 
 class BasicSweeper(StepSweeper):
@@ -26,11 +49,11 @@ class BasicSweeper(StepSweeper):
     Basic sweeper
     """
 
-    def __init__(self) -> None:
+    def __init__(self, max_batch_size: Optional[int]) -> None:
         """
         Instantiates
         """
-        super(BasicSweeper, self).__init__()
+        super(BasicSweeper, self).__init__(max_batch_size=max_batch_size)
         self.job_results: Optional[Sequence[JobReturn]] = None
 
     def get_job_batch(self) -> Sequence[Sequence[str]]:

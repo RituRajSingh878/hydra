@@ -23,11 +23,12 @@ class StepSweeper(Sweeper):
     It's using an internal launcher instance to launch each batch.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, max_batch_size: Optional[int]) -> None:
         super(StepSweeper, self).__init__()
         self.arguments: Optional[List[str]] = None
         self.launcher: Optional[Launcher] = None
         self.config: Optional[DictConfig] = None
+        self.max_batch_size = max_batch_size
 
     def setup(
         self,
