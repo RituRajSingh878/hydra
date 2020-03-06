@@ -18,129 +18,129 @@ from hydra.test_utils.test_utils import (
 
 
 class LauncherTestSuite:
-    # def test_sweep_1_job(
-    #     self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
-    # ) -> None:
-    #     sweep_1_job(
-    #         sweep_runner,
-    #         overrides=["hydra/launcher=" + launcher_name, "hydra.sweep.dir=."]
-    #         + overrides,
-    #     )
-    #
-    # def test_sweep_2_jobs(
-    #     self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
-    # ) -> None:  # noqa: F811
-    #     sweep_2_jobs(
-    #         sweep_runner, overrides=["hydra/launcher=" + launcher_name] + overrides
-    #     )
-    #
-    # def test_not_sweeping_hydra_overrides(
-    #     self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
-    # ) -> None:  # noqa: F811
-    #     not_sweeping_hydra_overrides(
-    #         sweep_runner, overrides=["hydra/launcher=" + launcher_name] + overrides
-    #     )
-    #
-    # def test_sweep_1_job_strict(
-    #     self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
-    # ) -> None:  # noqa: F811
-    #     sweep_1_job(
-    #         sweep_runner,
-    #         strict=True,
-    #         overrides=["hydra/launcher=" + launcher_name] + overrides,
-    #     )
-    #
-    # def test_sweep_1_job_strict_and_bad_key(
-    #     self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
-    # ) -> None:  # noqa: F811
-    #     # Ideally this would be KeyError, This can't be more specific because some launcher plugins
-    #     # like submitit raises a different exception on job failure and not the underlying exception.
-    #     with pytest.raises(Exception):
-    #         sweep_1_job(
-    #             sweep_runner,
-    #             strict=True,
-    #             overrides=["hydra/launcher=" + launcher_name, "boo=bar"] + overrides,
-    #         )
-    #
-    # def test_sweep_2_optimizers(
-    #     self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
-    # ) -> None:
-    #     sweep_two_config_groups(
-    #         sweep_runner, overrides=["hydra/launcher=" + launcher_name] + overrides
-    #     )
-    #
-    # def test_sweep_over_unspecified_mandatory_default(
-    #     self,
-    #     sweep_runner: TSweepRunner,  # noqa: F811
-    #     launcher_name: str,
-    #     overrides: List[str],
-    # ) -> None:
-    #     base_overrides = ["hydra/launcher=" + launcher_name, "group1=file1,file2"]
-    #     sweep = sweep_runner(
-    #         calling_file=None,
-    #         calling_module="hydra.test_utils.a_module",
-    #         task_function=None,
-    #         config_path="configs",
-    #         config_name="unspecified_mandatory_default",
-    #         overrides=base_overrides + overrides,
-    #         strict=True,
-    #     )
-    #     expected_overrides = [["group1=file1"], ["group1=file2"]]
-    #     expected_conf = [OmegaConf.create({"foo": 10}), OmegaConf.create({"foo": 20})]
-    #     with sweep:
-    #         assert sweep.returns is not None
-    #         assert len(sweep.returns[0]) == 2
-    #         for i in range(2):
-    #             job_ret = sweep.returns[0][i]
-    #             assert job_ret.overrides == expected_overrides[i]
-    #             assert job_ret.cfg == expected_conf[i]
-    #             verify_dir_outputs(job_ret, job_ret.overrides)
-    #
-    # def test_sweep_and_override(
-    #     self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
-    # ) -> None:  # noqa: F811
-    #     """
-    #     Tests that we can override things in the configs merged in only during the sweep config construction
-    #     db.user=someone does not exist db_conf.yaml, and is only appear when we merge in db=mysql or db=postgresql.
-    #     This presents a tricky situation when operating in strict mode, this tests verifies it's handled correctly.
-    #     """
-    #     base_overrides = [
-    #         "hydra/launcher=" + launcher_name,
-    #         "db=mysql,postgresql",
-    #         "db.user=someone",
-    #     ]
-    #     sweep = sweep_runner(
-    #         calling_file=None,
-    #         calling_module="hydra.test_utils.a_module",
-    #         task_function=None,
-    #         config_path="configs",
-    #         config_name="db_conf.yaml",
-    #         overrides=base_overrides + overrides,
-    #         strict=True,
-    #     )
-    #     expected_overrides = [
-    #         ["db=mysql", "db.user=someone"],
-    #         ["db=postgresql", "db.user=someone"],
-    #     ]
-    #     expected_conf = [
-    #         {"db": {"driver": "mysql", "password": "secret", "user": "someone"}},
-    #         {
-    #             "db": {
-    #                 "user": "someone",
-    #                 "driver": "postgresql",
-    #                 "password": "drowssap",
-    #                 "timeout": 10,
-    #             }
-    #         },
-    #     ]
-    #     with sweep:
-    #         assert sweep.returns is not None
-    #         assert len(sweep.returns[0]) == 2
-    #         for i in range(2):
-    #             job_ret = sweep.returns[0][i]
-    #             assert job_ret.overrides == expected_overrides[i]
-    #             assert job_ret.cfg == expected_conf[i]
-    #             verify_dir_outputs(job_ret, job_ret.overrides)
+    def test_sweep_1_job(
+        self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
+    ) -> None:
+        sweep_1_job(
+            sweep_runner,
+            overrides=["hydra/launcher=" + launcher_name, "hydra.sweep.dir=."]
+            + overrides,
+        )
+
+    def test_sweep_2_jobs(
+        self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
+    ) -> None:  # noqa: F811
+        sweep_2_jobs(
+            sweep_runner, overrides=["hydra/launcher=" + launcher_name] + overrides
+        )
+
+    def test_not_sweeping_hydra_overrides(
+        self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
+    ) -> None:  # noqa: F811
+        not_sweeping_hydra_overrides(
+            sweep_runner, overrides=["hydra/launcher=" + launcher_name] + overrides
+        )
+
+    def test_sweep_1_job_strict(
+        self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
+    ) -> None:  # noqa: F811
+        sweep_1_job(
+            sweep_runner,
+            strict=True,
+            overrides=["hydra/launcher=" + launcher_name] + overrides,
+        )
+
+    def test_sweep_1_job_strict_and_bad_key(
+        self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
+    ) -> None:  # noqa: F811
+        # Ideally this would be KeyError, This can't be more specific because some launcher plugins
+        # like submitit raises a different exception on job failure and not the underlying exception.
+        with pytest.raises(Exception):
+            sweep_1_job(
+                sweep_runner,
+                strict=True,
+                overrides=["hydra/launcher=" + launcher_name, "boo=bar"] + overrides,
+            )
+
+    def test_sweep_2_optimizers(
+        self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
+    ) -> None:
+        sweep_two_config_groups(
+            sweep_runner, overrides=["hydra/launcher=" + launcher_name] + overrides
+        )
+
+    def test_sweep_over_unspecified_mandatory_default(
+        self,
+        sweep_runner: TSweepRunner,  # noqa: F811
+        launcher_name: str,
+        overrides: List[str],
+    ) -> None:
+        base_overrides = ["hydra/launcher=" + launcher_name, "group1=file1,file2"]
+        sweep = sweep_runner(
+            calling_file=None,
+            calling_module="hydra.test_utils.a_module",
+            task_function=None,
+            config_path="configs",
+            config_name="unspecified_mandatory_default",
+            overrides=base_overrides + overrides,
+            strict=True,
+        )
+        expected_overrides = [["group1=file1"], ["group1=file2"]]
+        expected_conf = [OmegaConf.create({"foo": 10}), OmegaConf.create({"foo": 20})]
+        with sweep:
+            assert sweep.returns is not None
+            assert len(sweep.returns[0]) == 2
+            for i in range(2):
+                job_ret = sweep.returns[0][i]
+                assert job_ret.overrides == expected_overrides[i]
+                assert job_ret.cfg == expected_conf[i]
+                verify_dir_outputs(job_ret, job_ret.overrides)
+
+    def test_sweep_and_override(
+        self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
+    ) -> None:  # noqa: F811
+        """
+        Tests that we can override things in the configs merged in only during the sweep config construction
+        db.user=someone does not exist db_conf.yaml, and is only appear when we merge in db=mysql or db=postgresql.
+        This presents a tricky situation when operating in strict mode, this tests verifies it's handled correctly.
+        """
+        base_overrides = [
+            "hydra/launcher=" + launcher_name,
+            "db=mysql,postgresql",
+            "db.user=someone",
+        ]
+        sweep = sweep_runner(
+            calling_file=None,
+            calling_module="hydra.test_utils.a_module",
+            task_function=None,
+            config_path="configs",
+            config_name="db_conf.yaml",
+            overrides=base_overrides + overrides,
+            strict=True,
+        )
+        expected_overrides = [
+            ["db=mysql", "db.user=someone"],
+            ["db=postgresql", "db.user=someone"],
+        ]
+        expected_conf = [
+            {"db": {"driver": "mysql", "password": "secret", "user": "someone"}},
+            {
+                "db": {
+                    "user": "someone",
+                    "driver": "postgresql",
+                    "password": "drowssap",
+                    "timeout": 10,
+                }
+            },
+        ]
+        with sweep:
+            assert sweep.returns is not None
+            assert len(sweep.returns[0]) == 2
+            for i in range(2):
+                job_ret = sweep.returns[0][i]
+                assert job_ret.overrides == expected_overrides[i]
+                assert job_ret.cfg == expected_conf[i]
+                verify_dir_outputs(job_ret, job_ret.overrides)
 
     def test_sweep_2_jobs_2_batches(
         self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
@@ -148,8 +148,8 @@ class LauncherTestSuite:
         base_overrides = [
             "hydra/launcher=" + launcher_name,
             "hydra.sweeper.params.max_batch_size=2",
-            "seed=1,2,3",
         ]
+        overrides.extend(["group1=file1,file2", "seed=1,2,3"])
         sweep = sweep_runner(
             calling_file=None,
             calling_module="hydra.test_utils.a_module",
@@ -161,23 +161,33 @@ class LauncherTestSuite:
         )
         expected_overrides = [
             ["group1=file1", "seed=1"],
-            ["group1=file2", "seed=1"],
             ["group1=file1", "seed=2"],
-            ["group1=file2", "seed=2"],
             ["group1=file1", "seed=3"],
+            ["group1=file2", "seed=1"],
+            ["group1=file2", "seed=2"],
             ["group1=file2", "seed=3"],
         ]
 
-        expected_conf = [OmegaConf.create({"foo": 10}), OmegaConf.create({"foo": 20})]
+        expected_conf = [
+            {"foo": 10, "seed": 1, "bar": 100},
+            {"foo": 10, "seed": 2, "bar": 100},
+            {"foo": 10, "seed": 3, "bar": 100},
+            {"foo": 20, "seed": 1, "bar": 100},
+            {"foo": 20, "seed": 2, "bar": 100},
+            {"foo": 20, "seed": 3, "bar": 100},
+        ]
+
+        dirs = set()
         with sweep:
             assert sweep.returns is not None
-            # TODO
-            # assert len(sweep.returns[0]) == 6
-            # for i in range(2):
-            #     job_ret = sweep.returns[0][i]
-            #     assert job_ret.overrides == expected_overrides[i]
-            #     assert job_ret.cfg == expected_conf[i]
-            #     verify_dir_outputs(job_ret, job_ret.overrides)
+            flat = [rt for batch in sweep.returns for rt in batch]
+            assert len(flat) == 6
+            for idx, job_ret in enumerate(flat):
+                assert job_ret.overrides == expected_overrides[idx]
+                assert job_ret.cfg == expected_conf[idx]
+                dirs.add(job_ret.working_dir)
+                verify_dir_outputs(job_ret, job_ret.overrides)
+        assert len(dirs) == 6
 
 
 def sweep_1_job(
@@ -201,7 +211,7 @@ def sweep_1_job(
         job_ret = sweep.returns[0]
         assert len(job_ret) == 1
         assert job_ret[0].overrides == []
-        assert job_ret[0].cfg == {"foo": 10, "bar": 100}
+        assert job_ret[0].cfg == {"foo": 10, "bar": 100, "seed": None}
         assert job_ret[0].hydra_cfg.hydra.job.name == "a_module", (
             "Unexpected job name: " + job_ret[0].hydra_cfg.hydra.job.name
         )
@@ -221,7 +231,7 @@ def sweep_2_jobs(sweep_runner: TSweepRunner, overrides: List[str]) -> None:
         config_name=None,
         overrides=overrides,
     )
-    base = OmegaConf.create({"foo": 10, "bar": 100, "a": 0})
+    base = OmegaConf.create({"foo": 10, "bar": 100, "a": 0, "seed": None})
 
     with sweep:
         assert sweep.temp_dir is not None
@@ -261,7 +271,7 @@ def not_sweeping_hydra_overrides(
         overrides=overrides,
         strict=None,
     )
-    base = OmegaConf.create({"foo": 10, "bar": 100})
+    base = OmegaConf.create({"foo": 10, "bar": 100, "seed": None})
 
     with sweep:
         assert sweep.returns is not None
@@ -292,8 +302,8 @@ def sweep_two_config_groups(sweep_runner: TSweepRunner, overrides: List[str]) ->
     )
     expected_overrides = [["group1=file1"], ["group1=file2"]]
     expected_conf = [
-        OmegaConf.create({"foo": 10, "bar": 100}),
-        OmegaConf.create({"foo": 20, "bar": 100}),
+        OmegaConf.create({"foo": 10, "bar": 100, "seed": None}),
+        OmegaConf.create({"foo": 20, "bar": 100, "seed": None}),
     ]
     with sweep:
         assert sweep.returns is not None

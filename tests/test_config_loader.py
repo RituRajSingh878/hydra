@@ -34,7 +34,12 @@ hydra_load_list: List[Tuple[str, Optional[str], Optional[str], Optional[str]]] =
     ("hydra/hydra_logging/default", "pkg://hydra.conf", "hydra", None),
     ("hydra/job_logging/default", "pkg://hydra.conf", "hydra", None),
     ("hydra/launcher/basic", "pkg://hydra.conf", "hydra", None),
-    ("hydra/sweeper/basic", "pkg://hydra.conf", "hydra", None),
+    (
+        "hydra/sweeper/basic",
+        "structured://",
+        "hydra._internal.core_plugins.basic_sweeper",
+        None,
+    ),
     ("hydra/output/default", "pkg://hydra.conf", "hydra", None),
     ("hydra/help/default", "pkg://hydra.conf", "hydra", None),
     ("hydra/hydra_help/default", "pkg://hydra.conf", "hydra", None),
@@ -141,7 +146,7 @@ class TestConfigLoader:
             config_name="compose.yaml", overrides=["foo=ZZZ"], strict=True
         )
         del cfg["hydra"]
-        assert cfg == {"foo": "ZZZ", "bar": 100}
+        assert cfg == {"foo": "ZZZ", "bar": 100, "seed": None}
 
         # Test that accessing a key that is not there will fail
         with pytest.raises(AttributeError):
@@ -209,7 +214,7 @@ class TestConfigLoader:
             config_name="compose.yaml", overrides=["group1=abc.cde"], strict=False
         )
         del cfg["hydra"]
-        assert cfg == {"abc=cde": None, "bar": 100}
+        assert cfg == {"abc=cde": None, "bar": 100, "seed": None}
 
     def test_load_config_with_schema(
         self, restore_singletons: Any, path: str  # noqa: F811
@@ -398,7 +403,12 @@ def test_override_hydra_config_group_from_config_file() -> None:
         ("hydra_config", "structured://", "hydra", None),
         ("hydra/hydra_logging/hydra_debug", "pkg://hydra.conf", "hydra", None),
         ("hydra/job_logging/disabled", "pkg://hydra.conf", "hydra", None),
-        ("hydra/sweeper/basic", "pkg://hydra.conf", "hydra", None),
+        (
+            "hydra/sweeper/basic",
+            "structured://",
+            "hydra._internal.core_plugins.basic_sweeper",
+            None,
+        ),
         ("hydra/output/default", "pkg://hydra.conf", "hydra", None),
         ("hydra/help/default", "pkg://hydra.conf", "hydra", None),
         ("hydra/hydra_help/default", "pkg://hydra.conf", "hydra", None),

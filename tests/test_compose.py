@@ -52,8 +52,8 @@ def test_initialize_with_config_dir() -> None:
     [
         (None, [], {}),
         (None, ["foo=bar"], {"foo": "bar"}),
-        ("compose.yaml", [], {"foo": 10, "bar": 100}),
-        ("compose.yaml", ["group1=file2"], {"foo": 20, "bar": 100}),
+        ("compose.yaml", [], {"foo": 10, "bar": 100, "seed": None}),
+        ("compose.yaml", ["group1=file2"], {"foo": 20, "bar": 100, "seed": None}),
     ],
 )
 class TestCompose:

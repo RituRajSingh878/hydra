@@ -16,7 +16,7 @@ Basic Sweeper would generate 6 jobs:
 import copy
 import itertools
 from dataclasses import dataclass
-from typing import Optional, Sequence, List
+from typing import List, Optional, Sequence
 
 from hydra.conf import PluginConf
 from hydra.core.config_store import ConfigStore
@@ -40,7 +40,7 @@ ConfigStore.instance().store(
     name="basic",
     node=BasicSweeperConf,
     path="hydra.sweeper",
-    provider="hydra",
+    provider=__name__,
 )
 
 
@@ -54,8 +54,9 @@ class BasicSweeper(StepSweeper):
         Instantiates
         """
         super(BasicSweeper, self).__init__(max_batch_size=max_batch_size)
-        self.job_results: Optional[Sequence[JobReturn]] = None
-        self.overrides: Optional[Sequence[Sequence[str]]] = None
+        self.job_results: Optional[Sequence[Sequence[JobReturn]]] = []
+        self.overrides: Optional[Sequence[Sequence[Sequence[str]]]] = None
+        self.batch_index = 0
 
     def initialize_arguments(self, arguments: List[str]):
         lists = []
@@ -63,18 +64,27 @@ class BasicSweeper(StepSweeper):
             key, value = s.split("=")
             lists.append(["{}={}".format(key, val) for val in value.split(",")])
 
-        self.overrides: Sequence[Sequence[str]] = list(itertools.product(*lists))
+        def chunks(lst, n) -> Sequence[Sequence[Sequence[str]]]:
+            for i in range(0, len(lst), n):
+                yield lst[i : i + n]
+
+        all_batches = list(itertools.product(*lists))
+        assert self.max_batch_size is None or self.max_batch_size > 0
+        if self.max_batch_size is None:
+            self.overrides = [all_batches]
+        else:
+            self.overrides = list(chunks(all_batches, self.max_batch_size))
 
     def get_job_batch(self) -> Sequence[Sequence[str]]:
         """
         :return: A list of lists of strings, each inner list is the overrides for a single job
         that should be executed.
         """
-        return self.overrides
+        self.batch_index += 1
+        return self.overrides[self.batch_index - 1]
 
     def is_done(self) -> bool:
-        # just one batch
-        return self.job_results is not None
+        return self.batch_index >= len(self.overrides)
 
     def update_results(self, job_results: Sequence[JobReturn]) -> None:
-        self.job_results = copy.copy(job_results)
+        self.job_results.append(copy.copy(job_results))
