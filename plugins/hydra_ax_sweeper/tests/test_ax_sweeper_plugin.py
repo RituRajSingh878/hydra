@@ -6,11 +6,16 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import pytest
 from omegaconf import DictConfig, OmegaConf
 
 from hydra.core.hydra_config import HydraConfig
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
+from hydra.test_utils.launcher_common_tests import (
+    IntegrationTestSuite,
+    LauncherTestSuite,
+)
 
 # noinspection PyUnresolvedReferences
 from hydra.test_utils.test_utils import (  # noqa: F401
@@ -38,6 +43,34 @@ def quadratic(cfg: DictConfig) -> Any:
     b = 1
     z = a * (x ** 2) + b * y
     return z
+
+
+# Run launcher test suite with the basic launcher and this sweeper
+@pytest.mark.parametrize("launcher_name, overrides", [("basic", ["hydra/sweeper=ax"])])
+class TestExampleSweeper(LauncherTestSuite):
+    pass
+
+
+# Run integration test suite with the basic launcher and this sweeper
+@pytest.mark.parametrize(
+    "task_launcher_cfg, extra_flags",
+    [
+        (
+            {
+                "defaults": [
+                    {"hydra/sweeper": "ax"},
+                    {"hydra/launcher": "basic"},
+                    {"hydra/hydra_logging": "hydra_debug"},
+                    {"hydra/job_logging": "disabled"},
+                ],
+                "hydra": {},
+            },
+            ["-m"],
+        )
+    ],
+)
+class TestExampleSweeperIntegration(IntegrationTestSuite):
+    pass
 
 
 def test_jobs_configured_via_config(sweep_runner: TSweepRunner,) -> None:  # noqa: F811
