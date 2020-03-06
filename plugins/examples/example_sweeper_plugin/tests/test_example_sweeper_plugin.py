@@ -6,6 +6,7 @@ from hydra.plugins.sweeper import Sweeper
 from hydra.test_utils.launcher_common_tests import (
     IntegrationTestSuite,
     LauncherTestSuite,
+    BatchedSweeperTestSuite,
 )
 
 # noinspection PyUnresolvedReferences
@@ -52,7 +53,26 @@ def test_launched_jobs(sweep_runner: TSweepRunner) -> None:  # noqa: F811 # type
     ],
 )
 class TestExampleSweeper(LauncherTestSuite):
-    pass
+    ...
+
+
+# Many sweepers are batching jobs in groups.
+# This test suite verifies that the spawned jobs are not overstepping the directories of one another.
+@pytest.mark.parametrize(
+    "launcher_name, overrides",
+    [
+        (
+            "basic",
+            [
+                "hydra/sweeper=example",
+                # This will cause the sweeper to split batches to at most 2 jobs each.
+                "hydra.launcher.params.max_batch_size=2",
+            ],
+        )
+    ],
+)
+class TestExampleSweeperWithBatching(BatchedSweeperTestSuite):
+    ...
 
 
 # Run integration test suite with the basic launcher and this sweeper

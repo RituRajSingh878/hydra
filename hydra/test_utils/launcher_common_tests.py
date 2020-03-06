@@ -141,21 +141,22 @@ class LauncherTestSuite:
                 assert job_ret.cfg == expected_conf[i]
                 verify_dir_outputs(job_ret, job_ret.overrides)
 
+
+class BatchedSweeperTestSuite:
     def test_sweep_2_jobs_2_batches(
         self, sweep_runner: TSweepRunner, launcher_name: str, overrides: List[str]
     ) -> None:  # noqa: F811
-        base_overrides = [
-            "hydra/launcher=" + launcher_name,
-            "hydra.sweeper.params.max_batch_size=2",
-        ]
-        overrides.extend(["group1=file1,file2", "seed=1,2,3"])
+        overrides.extend(
+            # order sensitive?
+            ["hydra/launcher=" + launcher_name, "group1=file1,file2", "seed=1,2,3"]
+        )
         sweep = sweep_runner(
             calling_file=None,
             calling_module="hydra.test_utils.a_module",
             task_function=None,
             config_path="configs",
             config_name="compose.yaml",
-            overrides=base_overrides + overrides,
+            overrides=overrides,
             strict=True,
         )
         expected_overrides = [
@@ -179,14 +180,15 @@ class LauncherTestSuite:
         dirs: Set[str] = set()
         with sweep:
             assert sweep.returns is not None
+            assert len(sweep.returns) == 2  # expecting two batches
             flat = [rt for batch in sweep.returns for rt in batch]
-            assert len(flat) == 6
+            assert len(flat) == 6  # with a total of 6 jobs
             for idx, job_ret in enumerate(flat):
                 assert job_ret.overrides == expected_overrides[idx]
                 assert job_ret.cfg == expected_conf[idx]
                 dirs.add(job_ret.working_dir)
                 verify_dir_outputs(job_ret, job_ret.overrides)
-        assert len(dirs) == 6
+        assert len(dirs) == 6  # and a total of 6 unique output directories
 
 
 def sweep_1_job(
