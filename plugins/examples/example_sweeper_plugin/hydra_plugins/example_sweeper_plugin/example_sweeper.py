@@ -13,6 +13,13 @@ from hydra.plugins.search_path_plugin import SearchPathPlugin
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import TaskFunction
 
+# IMPORTANT:
+# If your plugin imports any module that takes more than a fraction of a second to import,
+# Import the module lazily (typically inside sweep()).
+# Installed plugins are imported during Hydra initialization and plugins that are slow to import plugins will slow
+# the startup of ALL hydra applications.
+
+
 log = logging.getLogger(__name__)
 
 
@@ -30,7 +37,8 @@ class ExampleSweeperSearchPathPlugin(SearchPathPlugin):
 
 
 class ExampleSweeper(Sweeper):
-    def __init__(self, foo: str, bar: str):
+    def __init__(self, max_batch_size: int, foo: str, bar: str):
+        self.max_batch_size = max_batch_size
         self.config: Optional[DictConfig] = None
         self.launcher: Optional[Launcher] = None
         self.job_results = None
@@ -61,8 +69,15 @@ class ExampleSweeper(Sweeper):
             # option to that list, otherwise add a single element with the value
             src_lists.append(["{}={}".format(key, val) for val in value.split(",")])
 
-        batch = list(itertools.product(*src_lists))
+        batches = list(itertools.product(*src_lists))
+        chunked_batches = list(
+            Sweeper.split_overrides_to_chunks(batches, self.max_batch_size)
+        )
 
-        returns = [self.launcher.launch(batch)]
-        # returns are not acted on right now.
+        returns = []
+        initial_idx = 0
+        for batch in chunked_batches:
+            results = self.launcher.launch(batch, initial_idx=initial_idx)
+            initial_idx += len(batch)
+            returns.append(results)
         return returns

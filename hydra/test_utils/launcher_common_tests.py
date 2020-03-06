@@ -3,9 +3,8 @@
 Common test functions testing launchers
 """
 import copy
-import importlib
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Set
 
 import pytest
 from omegaconf import DictConfig, OmegaConf
@@ -177,7 +176,7 @@ class LauncherTestSuite:
             {"foo": 20, "seed": 3, "bar": 100},
         ]
 
-        dirs = set()
+        dirs: Set[str] = set()
         with sweep:
             assert sweep.returns is not None
             flat = [rt for batch in sweep.returns for rt in batch]
@@ -316,14 +315,6 @@ def sweep_two_config_groups(sweep_runner: TSweepRunner, overrides: List[str]) ->
 
 
 class IntegrationTestSuite:
-    @staticmethod
-    def verify_plugin(plugin_module: Optional[str]) -> None:
-        if plugin_module is not None:
-            try:
-                importlib.import_module(plugin_module)
-            except ImportError:
-                pytest.skip("Plugin {} not installed".format(plugin_module))
-
     @pytest.mark.parametrize(  # type: ignore
         "task_config, overrides, filename, expected_name",
         [
@@ -357,9 +348,7 @@ class IntegrationTestSuite:
         expected_name: str,
         task_launcher_cfg: DictConfig,
         extra_flags: List[str],
-        plugin_module: Optional[str],
     ) -> None:
-        # self.verify_plugin(plugin_module)
         overrides = extra_flags + overrides
         task_launcher_cfg = OmegaConf.create(task_launcher_cfg or {})  # type: ignore
         task_config = OmegaConf.create(task_config or {})  # type: ignore
@@ -461,9 +450,7 @@ class IntegrationTestSuite:
         expected_dir: str,
         task_launcher_cfg: DictConfig,
         extra_flags: List[str],
-        plugin_module: str,
     ) -> None:
-        # self.verify_plugin(plugin_module)
         overrides = extra_flags + overrides
         task_launcher_cfg = OmegaConf.create(task_launcher_cfg or {})  # type: ignore
         task_config = OmegaConf.create(task_config or {})  # type: ignore
@@ -478,13 +465,8 @@ class IntegrationTestSuite:
         )
 
     def test_get_orig_dir_multirun(
-        self,
-        tmpdir: Path,
-        task_launcher_cfg: DictConfig,
-        extra_flags: List[str],
-        plugin_module: str,
+        self, tmpdir: Path, task_launcher_cfg: DictConfig, extra_flags: List[str]
     ) -> None:
-        # self.verify_plugin(plugin_module)
         overrides = extra_flags
         task_launcher_cfg = OmegaConf.create(task_launcher_cfg or {})  # type: ignore
         task_config = OmegaConf.create()

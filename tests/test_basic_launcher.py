@@ -16,7 +16,7 @@ class TestBasicLauncher(LauncherTestSuite):
 
 
 @pytest.mark.parametrize(
-    "task_launcher_cfg, extra_flags, plugin_module",
+    "task_launcher_cfg, extra_flags",
     [
         (
             {
@@ -27,7 +27,6 @@ class TestBasicLauncher(LauncherTestSuite):
                 ]
             },
             ["-m"],
-            "hydra._internal.core_plugins.basic_launcher",
         )
     ],
 )

@@ -3,7 +3,7 @@
 Sweeper plugin interface
 """
 from abc import abstractmethod
-from typing import Any, List
+from typing import Any, Iterable, List, Optional, Sequence
 
 from omegaconf import DictConfig
 
@@ -39,3 +39,13 @@ class Sweeper(Plugin):
         implementation.
         """
         ...
+
+    @staticmethod
+    def split_overrides_to_chunks(
+        lst: Sequence[Sequence[str]], n: Optional[int]
+    ) -> Iterable[Sequence[Sequence[str]]]:
+        if n is None or n == -1:
+            n = len(lst)
+        assert n > 0
+        for i in range(0, len(lst), n):
+            yield lst[i : i + n]

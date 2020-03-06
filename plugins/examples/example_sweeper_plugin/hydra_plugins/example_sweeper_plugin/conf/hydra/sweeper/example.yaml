@@ -2,5 +2,8 @@ hydra:
   sweeper:
     cls: hydra_plugins.example_sweeper_plugin.ExampleSweeper
     params:
+      # max number of jobs to run in the same batch.
+      # all sweeper should support this. null means unlimited.
+      max_batch_size: null
       foo: 10
       bar: abcde

@@ -19,6 +19,13 @@ from hydra.plugins.launcher import Launcher
 from hydra.plugins.search_path_plugin import SearchPathPlugin
 from hydra.types import TaskFunction
 
+# IMPORTANT:
+# If your plugin imports any module that takes more than a fraction of a second to import,
+# Import the module lazily (typically inside launch()).
+# Installed plugins are imported during Hydra initialization and plugins that are slow to import plugins will slow
+# the startup of ALL hydra applications.
+
+
 log = logging.getLogger(__name__)
 
 

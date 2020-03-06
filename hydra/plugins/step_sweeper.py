@@ -43,7 +43,7 @@ class StepSweeper(Sweeper):
             config=config, config_loader=config_loader, task_function=task_function
         )
 
-    def initialize_arguments(self, arguments: List[str]):
+    def initialize_arguments(self, arguments: List[str]) -> None:
         ...
 
     @abstractmethod

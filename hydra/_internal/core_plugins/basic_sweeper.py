@@ -22,6 +22,7 @@ from hydra.conf import PluginConf
 from hydra.core.config_store import ConfigStore
 from hydra.core.utils import JobReturn
 from hydra.plugins.step_sweeper import StepSweeper
+from hydra.plugins.sweeper import Sweeper
 
 
 @dataclass
@@ -54,37 +55,39 @@ class BasicSweeper(StepSweeper):
         Instantiates
         """
         super(BasicSweeper, self).__init__(max_batch_size=max_batch_size)
-        self.job_results: Optional[Sequence[Sequence[JobReturn]]] = []
+        # TODO: check if can remove job_results
+        self.job_results: Optional[List[Sequence[JobReturn]]] = []
         self.overrides: Optional[Sequence[Sequence[Sequence[str]]]] = None
         self.batch_index = 0
 
-    def initialize_arguments(self, arguments: List[str]):
+    def initialize_arguments(self, arguments: List[str]) -> None:
         lists = []
         for s in arguments:
             key, value = s.split("=")
             lists.append(["{}={}".format(key, val) for val in value.split(",")])
-
-        def chunks(lst, n) -> Sequence[Sequence[Sequence[str]]]:
-            for i in range(0, len(lst), n):
-                yield lst[i : i + n]
 
         all_batches = list(itertools.product(*lists))
         assert self.max_batch_size is None or self.max_batch_size > 0
         if self.max_batch_size is None:
             self.overrides = [all_batches]
         else:
-            self.overrides = list(chunks(all_batches, self.max_batch_size))
+            self.overrides = list(
+                Sweeper.split_overrides_to_chunks(all_batches, self.max_batch_size)
+            )
 
     def get_job_batch(self) -> Sequence[Sequence[str]]:
         """
         :return: A list of lists of strings, each inner list is the overrides for a single job
         that should be executed.
         """
+        assert self.overrides is not None
         self.batch_index += 1
         return self.overrides[self.batch_index - 1]
 
     def is_done(self) -> bool:
+        assert self.overrides is not None
         return self.batch_index >= len(self.overrides)
 
     def update_results(self, job_results: Sequence[JobReturn]) -> None:
+        assert self.job_results is not None
         self.job_results.append(copy.copy(job_results))
