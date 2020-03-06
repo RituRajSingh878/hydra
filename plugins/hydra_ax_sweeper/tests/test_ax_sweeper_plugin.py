@@ -12,7 +12,7 @@ from omegaconf import DictConfig, OmegaConf
 from hydra.core.hydra_config import HydraConfig
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
-from hydra.test_utils.launcher_common_tests import (
+from hydra.test_utils.launcher_common_tests import (  # BatchedSweeperTestSuite,
     IntegrationTestSuite,
     LauncherTestSuite,
 )
@@ -23,7 +23,7 @@ from hydra.test_utils.test_utils import (  # noqa: F401
     chdir_plugin_root,
     sweep_runner,
 )
-from hydra_plugins.hydra_ax_sweeper import AxSweeper
+from hydra_plugins.hydra_ax_sweeper import AxSweeper  # type: ignore
 
 chdir_plugin_root()
 
@@ -71,6 +71,27 @@ class TestExampleSweeper(LauncherTestSuite):
 )
 class TestExampleSweeperIntegration(IntegrationTestSuite):
     pass
+
+
+# TODO: enable this
+# # Many sweepers are batching jobs in groups.
+# # This test suite verifies that the spawned jobs are not overstepping the directories of one another.
+# @pytest.mark.parametrize(
+#     "launcher_name, overrides",
+#     [
+#         (
+#             "basic",
+#             [
+#                 "hydra/sweeper=ax",
+#                 # This will cause the sweeper to split batches to at most 2 jobs each, which is what
+#                 # the tests in BatchedSweeperTestSuite are expecting.
+#                 "hydra.sweeper.params.max_batch_size=2",
+#             ],
+#         )
+#     ],
+# )
+# class TestExampleSweeperWithBatching(BatchedSweeperTestSuite):
+#     ...
 
 
 def test_jobs_configured_via_config(sweep_runner: TSweepRunner,) -> None:  # noqa: F811
