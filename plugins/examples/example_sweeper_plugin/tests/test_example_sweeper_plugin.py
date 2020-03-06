@@ -27,6 +27,6 @@ def test_launched_jobs(sweep_runner: TSweepRunner) -> None:  # noqa: F811 # type
         job_ret = sweep.returns[0]
         assert len(job_ret) == 2
         assert job_ret[0].overrides == ["foo=1"]
-        assert job_ret[0].cfg == {"foo": 1, "bar": 100}
+        assert job_ret[0].cfg == {"foo": 1, "bar": 100, "seed": None}
         assert job_ret[1].overrides == ["foo=2"]
-        assert job_ret[1].cfg == {"foo": 2, "bar": 100}
+        assert job_ret[1].cfg == {"foo": 2, "bar": 100, "seed": None}
