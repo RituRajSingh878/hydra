@@ -180,7 +180,11 @@ class BatchedSweeperTestSuite:
         dirs: Set[str] = set()
         with sweep:
             assert sweep.returns is not None
-            assert len(sweep.returns) == 2  # expecting two batches
+            # expecting 3 batches of 2
+            assert len(sweep.returns) == 3
+            for batch in sweep.returns:
+                assert len(batch) == 2
+
             flat = [rt for batch in sweep.returns for rt in batch]
             assert len(flat) == 6  # with a total of 6 jobs
             for idx, job_ret in enumerate(flat):

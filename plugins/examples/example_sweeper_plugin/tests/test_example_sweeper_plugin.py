@@ -4,9 +4,9 @@ import pytest
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
 from hydra.test_utils.launcher_common_tests import (
+    BatchedSweeperTestSuite,
     IntegrationTestSuite,
     LauncherTestSuite,
-    BatchedSweeperTestSuite,
 )
 
 # noinspection PyUnresolvedReferences
@@ -65,8 +65,9 @@ class TestExampleSweeper(LauncherTestSuite):
             "basic",
             [
                 "hydra/sweeper=example",
-                # This will cause the sweeper to split batches to at most 2 jobs each.
-                "hydra.launcher.params.max_batch_size=2",
+                # This will cause the sweeper to split batches to at most 2 jobs each, which is what
+                # the tests in BatchedSweeperTestSuite are expecting.
+                "hydra.sweeper.params.max_batch_size=2",
             ],
         )
     ],
