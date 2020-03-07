@@ -6,16 +6,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import pytest
 from omegaconf import DictConfig, OmegaConf
 
 from hydra.core.hydra_config import HydraConfig
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
-from hydra.test_utils.launcher_common_tests import (  # BatchedSweeperTestSuite,
-    IntegrationTestSuite,
-    LauncherTestSuite,
-)
 
 # noinspection PyUnresolvedReferences
 from hydra.test_utils.test_utils import (  # noqa: F401
@@ -23,7 +18,7 @@ from hydra.test_utils.test_utils import (  # noqa: F401
     chdir_plugin_root,
     sweep_runner,
 )
-from hydra_plugins.hydra_ax_sweeper import AxSweeper  # type: ignore
+from hydra_plugins.hydra_ax_sweeper import AxSweeper
 
 chdir_plugin_root()
 
@@ -45,35 +40,7 @@ def quadratic(cfg: DictConfig) -> Any:
     return z
 
 
-# Run launcher test suite with the basic launcher and this sweeper
-@pytest.mark.parametrize("launcher_name, overrides", [("basic", ["hydra/sweeper=ax"])])
-class TestExampleSweeper(LauncherTestSuite):
-    pass
-
-
-# Run integration test suite with the basic launcher and this sweeper
-@pytest.mark.parametrize(
-    "task_launcher_cfg, extra_flags",
-    [
-        (
-            {
-                "defaults": [
-                    {"hydra/sweeper": "ax"},
-                    {"hydra/launcher": "basic"},
-                    {"hydra/hydra_logging": "hydra_debug"},
-                    {"hydra/job_logging": "disabled"},
-                ],
-                "hydra": {},
-            },
-            ["-m"],
-        )
-    ],
-)
-class TestExampleSweeperIntegration(IntegrationTestSuite):
-    pass
-
-
-# TODO: enable this
+# TODO: try to enable this
 # # Many sweepers are batching jobs in groups.
 # # This test suite verifies that the spawned jobs are not overstepping the directories of one another.
 # @pytest.mark.parametrize(

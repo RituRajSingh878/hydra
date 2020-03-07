@@ -38,7 +38,7 @@ class BasicLauncher(Launcher):
         self.task_function = task_function
 
     def launch(
-        self, job_overrides: Sequence[Sequence[str]], initial_idx: int = 0
+        self, job_overrides: Sequence[Sequence[str]], initial_idx: int
     ) -> Sequence[JobReturn]:
         setup_globals()
         assert self.config is not None
